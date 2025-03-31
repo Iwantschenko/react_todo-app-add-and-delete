@@ -13,12 +13,13 @@ import { ErrorNotification } from './components/ErrorNotification';
 import { TodoList } from './components/Main/TodoList';
 import { TodoFilter } from './components/TodoFilter';
 import { FilterType } from './types/FilterType';
-import { todosService } from './api/todos';
+import { todosService, USER_ID } from './api/todos';
 
 export const App = () => {
   const [todoList, setTodoList] = useState<Todo[]>([]);
   const [errorMessage, setErrorMessage] = useState<ErrorMessages | null>(null);
   const [currentFilter, setCurrentFilter] = useState(FilterType.All);
+  const [tempTodo, setTempTodo] = useState<Todo | null>(null);
 
   useEffect(() => {
     const fetchTodos = async () => {
@@ -49,7 +50,7 @@ export const App = () => {
     return todoList.filter(todo => todo.completed === false).length;
   };
 
-  const checkForDoneTask = () => {
+  const hasComplitedTodos = () => {
     if (todoList.length === 0) {
       return true;
     }
@@ -57,14 +58,47 @@ export const App = () => {
     return todoList.some(todo => todo.completed === true);
   };
 
+  const isToggleAll = () => {
+    return todoList.every(todo => todo.completed);
+  };
+
+  const onAddTodo = async (title: string) => {
+    const newTodo: Todo = {
+      id: 0,
+      title: title,
+      completed: false,
+      userId: USER_ID,
+    };
+
+    setTempTodo({ ...newTodo });
+
+    try {
+      const requestResult = await todosService.add(newTodo);
+
+      setTempTodo(null);
+      setTodoList(current => [...current, requestResult]);
+    } catch {
+      setTempTodo(null);
+      throw new Error();
+    }
+  };
+
   return (
     <div className="todoapp">
       <h1 className="todoapp__title">todos</h1>
 
       <div className="todoapp__content">
-        <Header />
+        <Header
+          isToggleAll={isToggleAll}
+          onAddTodo={onAddTodo}
+          onErrorMessage={message => setErrorMessage(message)}
+        />
+        <section className="todoapp__main" data-cy="TodoList">
+          {todoList && (
+            <TodoList todoList={getFilteredTodos()} tempTodo={tempTodo} />
+          )}
+        </section>
 
-        {todoList && <TodoList todoList={getFilteredTodos()} />}
         {todoList.length !== 0 && (
           <>
             <footer className="todoapp__footer" data-cy="Footer">
@@ -75,11 +109,10 @@ export const App = () => {
                 selectedFilter={currentFilter}
                 onFilterChange={newFilter => setCurrentFilter(newFilter)}
               />
-              {/* this button should be disabled if there are no completed todos */}
               <button
                 type="button"
                 className="todoapp__clear-completed"
-                disabled={checkForDoneTask()}
+                disabled={!hasComplitedTodos()}
                 data-cy="ClearCompletedButton"
               >
                 Clear completed

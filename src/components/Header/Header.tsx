@@ -1,18 +1,70 @@
+import { useEffect, useRef, useState } from 'react';
 import '../../styles/todoapp.scss';
+import classNames from 'classnames';
+import { ErrorMessages } from '../../types/ErrorMessage';
 
-export const Header = () => {
+interface Props {
+  onErrorMessage: (message: ErrorMessages) => void;
+  isToggleAll: () => boolean;
+  onAddTodo: (title: string) => Promise<void>;
+}
+
+export const Header: React.FC<Props> = ({
+  isToggleAll,
+  onAddTodo,
+  onErrorMessage,
+}) => {
+  const inputElement = useRef<HTMLInputElement>(null);
+  const [isRequestPending, setIsRequestPending] = useState(false);
+  const callFocus = () => {
+    setTimeout(() => {
+      inputElement.current?.focus();
+    }, 0);
+  };
+
+  useEffect(() => {
+    callFocus();
+  }, []);
+
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const inputText = inputElement.current?.value.trim() || '';
+
+    if (inputText === '') {
+      onErrorMessage(ErrorMessages.emptyTitleError);
+
+      return;
+    }
+
+    setIsRequestPending(true);
+    try {
+      await onAddTodo(inputText);
+
+      if (inputElement.current) {
+        inputElement.current.value = '';
+      }
+    } catch {
+      onErrorMessage(ErrorMessages.addError);
+    }
+
+    setIsRequestPending(false);
+    callFocus();
+  };
+
   return (
     <header className="todoapp__header">
-      {/* this button should have `active` class only if all todos are completed */}
       <button
         type="button"
-        className="todoapp__toggle-all active"
+        className={classNames('todoapp__toggle-all', {
+          active: isToggleAll(),
+        })}
         data-cy="ToggleAllButton"
       />
 
-      {/* Add a todo on form submit */}
-      <form>
+      <form onSubmit={onSubmit}>
         <input
+          disabled={isRequestPending}
+          ref={inputElement}
           data-cy="NewTodoField"
           type="text"
           className="todoapp__new-todo"
