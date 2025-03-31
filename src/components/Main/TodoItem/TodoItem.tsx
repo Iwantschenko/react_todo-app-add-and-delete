@@ -4,12 +4,14 @@
 import { Todo } from '../../../types/Todo';
 import '../../../styles/todo.scss';
 import classNames from 'classnames';
+import { TempTodoItemType } from '../../../types/TempTodoItemType';
 
 interface Props {
   todo: Todo;
+  requestType?: TempTodoItemType;
 }
 
-export const TodoItem: React.FC<Props> = ({ todo }) => {
+export const TodoItem: React.FC<Props> = ({ todo, requestType }) => {
   return (
     <div
       data-cy="Todo"
@@ -34,7 +36,12 @@ export const TodoItem: React.FC<Props> = ({ todo }) => {
         ×
       </button>
 
-      <div data-cy="TodoLoader" className="modal overlay">
+      <div
+        data-cy="TodoLoader"
+        className={classNames('modal overlay', {
+          'is-active': requestType === 'POST',
+        })}
+      >
         <div className="modal-background has-background-white-ter" />
         <div className="loader" />
       </div>
