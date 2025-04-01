@@ -7,24 +7,17 @@ interface Props {
   onErrorMessage: (message: ErrorMessages) => void;
   isToggleAll: () => boolean;
   onAddTodo: (title: string) => Promise<void>;
+  selectInputElement: boolean;
 }
 
 export const Header: React.FC<Props> = ({
   isToggleAll,
   onAddTodo,
   onErrorMessage,
+  selectInputElement,
 }) => {
   const inputElement = useRef<HTMLInputElement>(null);
   const [isRequestPending, setIsRequestPending] = useState(false);
-  const callFocus = () => {
-    setTimeout(() => {
-      inputElement.current?.focus();
-    }, 0);
-  };
-
-  useEffect(() => {
-    callFocus();
-  }, []);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -48,8 +41,15 @@ export const Header: React.FC<Props> = ({
     }
 
     setIsRequestPending(false);
-    callFocus();
   };
+
+  useEffect(() => {
+    if (!isRequestPending) {
+      setTimeout(() => {
+        inputElement.current?.focus();
+      }, 0);
+    }
+  }, [selectInputElement, isRequestPending]);
 
   return (
     <header className="todoapp__header">

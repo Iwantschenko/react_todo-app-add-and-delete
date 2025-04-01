@@ -21,6 +21,8 @@ export const App = () => {
   const [errorMessage, setErrorMessage] = useState<ErrorMessages | null>(null);
   const [currentFilter, setCurrentFilter] = useState(FilterType.All);
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
+  const [selectInputElement, setSelectInputElement] = useState(true);
+  const [isRemoveAllComplited, setIsRemoveAllComplited] = useState(false);
 
   const getFilteredTodos = () => {
     switch (currentFilter) {
@@ -68,6 +70,28 @@ export const App = () => {
       setTempTodo(null);
       throw new Error();
     }
+
+    setSelectInputElement(true);
+  };
+
+  const onRemoveTodo = async (todoToRemove: Todo) => {
+    try {
+      await todosService.remove(todoToRemove);
+      setTodoList(prev => prev.filter(todo => todo.id !== todoToRemove.id));
+    } catch {
+      setErrorMessage(ErrorMessages.deleteError);
+    }
+
+    setSelectInputElement(!selectInputElement);
+  };
+
+  const removeAllComplited = async () => {
+    setIsRemoveAllComplited(true);
+    const complitedTodo = todoList.filter(todo => todo.completed);
+
+    await Promise.allSettled(complitedTodo.map(todo => onRemoveTodo(todo)));
+
+    setIsRemoveAllComplited(false);
   };
 
   useEffect(() => {
@@ -93,9 +117,16 @@ export const App = () => {
           isToggleAll={isToggleAll}
           onAddTodo={onAddTodo}
           onErrorMessage={message => setErrorMessage(message)}
+          selectInputElement={selectInputElement}
         />
         <section className="todoapp__main" data-cy="TodoList">
-          {todoList && <TodoList todoList={getFilteredTodos()} />}
+          {todoList && (
+            <TodoList
+              todoList={getFilteredTodos()}
+              onRemoveItem={onRemoveTodo}
+              isRemoveAllComplited={isRemoveAllComplited}
+            />
+          )}
           {tempTodo && (
             <TodoItem key={tempTodo.id} todo={tempTodo} requestType="POST" />
           )}
@@ -112,6 +143,7 @@ export const App = () => {
                 onFilterChange={newFilter => setCurrentFilter(newFilter)}
               />
               <button
+                onClick={() => removeAllComplited()}
                 type="button"
                 className="todoapp__clear-completed"
                 disabled={!hasComplitedTodos()}
