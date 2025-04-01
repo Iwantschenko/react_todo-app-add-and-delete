@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import './styles/todoapp.scss';
 
 import { Todo } from './types/Todo';
-import { ErrorMessages } from './types/ErrorMessage';
 
 import { Header } from './components/Header';
 import { ErrorNotification } from './components/ErrorNotification';
@@ -15,6 +14,7 @@ import { TodoFilter } from './components/TodoFilter';
 import { FilterType } from './types/FilterType';
 import { todosService, USER_ID } from './api/todos';
 import { TodoItem } from './components/Main/TodoItem';
+import { ErrorMessages } from './types/ErrorMessage';
 
 export const App = () => {
   const [todoList, setTodoList] = useState<Todo[]>([]);
