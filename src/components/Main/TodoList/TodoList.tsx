@@ -4,18 +4,14 @@ import { TodoItem } from '../TodoItem';
 
 interface Props {
   todoList: Todo[];
-  tempTodo: Todo | null;
 }
 
-export const TodoList: React.FC<Props> = ({ todoList, tempTodo }) => {
+export const TodoList: React.FC<Props> = ({ todoList }) => {
   return (
     <>
       {todoList.map((todo: Todo) => (
         <TodoItem key={todo.id} todo={todo} />
       ))}
-      {tempTodo && (
-        <TodoItem key={tempTodo.id} todo={tempTodo} requestType="POST" />
-      )}
     </>
   );
 };

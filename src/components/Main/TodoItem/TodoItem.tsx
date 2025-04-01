@@ -5,13 +5,29 @@ import { Todo } from '../../../types/Todo';
 import '../../../styles/todo.scss';
 import classNames from 'classnames';
 import { TempTodoItemType } from '../../../types/TempTodoItemType';
+import { useRef } from 'react';
 
 interface Props {
   todo: Todo;
   requestType?: TempTodoItemType;
+  onRemoveItem: (id: number) => void;
 }
 
-export const TodoItem: React.FC<Props> = ({ todo, requestType }) => {
+export const TodoItem: React.FC<Props> = ({
+  todo,
+  requestType,
+  onRemoveItem,
+}) => {
+  const currentOperation = useRef(requestType);
+
+  const handleRemoveTodoItem = () => {
+    currentOperation.current = 'DELETE';
+
+    onRemoveItem(todo.id);
+
+    currentOperation.current = 'GET';
+  };
+
   return (
     <div
       data-cy="Todo"
@@ -32,14 +48,21 @@ export const TodoItem: React.FC<Props> = ({ todo, requestType }) => {
         {todo.title}
       </span>
 
-      <button type="button" className="todo__remove" data-cy="TodoDelete">
+      <button
+        onClick={handleRemoveTodoItem}
+        type="button"
+        className="todo__remove"
+        data-cy="TodoDelete"
+      >
         ×
       </button>
 
       <div
         data-cy="TodoLoader"
         className={classNames('modal overlay', {
-          'is-active': requestType === 'POST',
+          'is-active':
+            currentOperation.current === 'POST' ||
+            currentOperation.current === 'DELETE',
         })}
       >
         <div className="modal-background has-background-white-ter" />

@@ -14,26 +14,13 @@ import { TodoList } from './components/Main/TodoList';
 import { TodoFilter } from './components/TodoFilter';
 import { FilterType } from './types/FilterType';
 import { todosService, USER_ID } from './api/todos';
+import { TodoItem } from './components/Main/TodoItem';
 
 export const App = () => {
   const [todoList, setTodoList] = useState<Todo[]>([]);
   const [errorMessage, setErrorMessage] = useState<ErrorMessages | null>(null);
   const [currentFilter, setCurrentFilter] = useState(FilterType.All);
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
-
-  useEffect(() => {
-    const fetchTodos = async () => {
-      try {
-        const todos = await todosService.getAll();
-
-        setTodoList(todos);
-      } catch {
-        setErrorMessage(ErrorMessages.getError);
-      }
-    };
-
-    fetchTodos();
-  }, []);
 
   const getFilteredTodos = () => {
     switch (currentFilter) {
@@ -83,6 +70,20 @@ export const App = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchTodos = async () => {
+      try {
+        const todos = await todosService.getAll();
+
+        setTodoList(todos);
+      } catch {
+        setErrorMessage(ErrorMessages.getError);
+      }
+    };
+
+    fetchTodos();
+  }, []);
+
   return (
     <div className="todoapp">
       <h1 className="todoapp__title">todos</h1>
@@ -94,8 +95,9 @@ export const App = () => {
           onErrorMessage={message => setErrorMessage(message)}
         />
         <section className="todoapp__main" data-cy="TodoList">
-          {todoList && (
-            <TodoList todoList={getFilteredTodos()} tempTodo={tempTodo} />
+          {todoList && <TodoList todoList={getFilteredTodos()} />}
+          {tempTodo && (
+            <TodoItem key={tempTodo.id} todo={tempTodo} requestType="POST" />
           )}
         </section>
 

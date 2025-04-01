@@ -8,12 +8,12 @@ export const todosService = {
     return client.get<Todo[]>(`/todos?userId=${USER_ID}`);
   },
   add: (todo: Todo) => {
-    return client.post<Todo>(`/todos?userId=${USER_ID}`, todo);
+    return client.post<Todo>(`/todos`, todo);
   },
   remove: (todo: Todo) => {
-    return client.delete(`/todos?userId=${USER_ID}/${todo.id}`);
+    return client.delete(`/todos/${todo.id}`);
   },
   update: (todo: Todo) => {
-    return client.patch<Todo>(`/todos?userId=${USER_ID}/${todo.id}`, todo);
+    return client.patch<Todo>(`/todos/${todo.id}`, todo);
   },
 };
