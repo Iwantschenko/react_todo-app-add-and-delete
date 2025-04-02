@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import '../../styles/todoapp.scss';
 import classNames from 'classnames';
-import { ErrorMessages } from '../../types/ErrorMessage';
+import { ErrorMessages } from '../../types/ErrorMessages';
 
 interface Props {
   onErrorMessage: (message: ErrorMessages) => void;

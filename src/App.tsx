@@ -14,7 +14,7 @@ import { TodoFilter } from './components/TodoFilter';
 import { FilterType } from './types/FilterType';
 import { todosService, USER_ID } from './api/todos';
 import { TodoItem } from './components/Main/TodoItem';
-import { ErrorMessages } from './types/ErrorMessage';
+import { ErrorMessages } from './types/ErrorMessages';
 
 export const App = () => {
   const [todoList, setTodoList] = useState<Todo[]>([]);
