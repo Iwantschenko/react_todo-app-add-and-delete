@@ -3,7 +3,7 @@ import { ErrorMessages } from '../../types/ErrorMessages';
 import { Todo } from '../../types/Todo';
 
 interface Props {
-  onAddTodo: (title: string) => Todo | null;
+  onAddTodo: (title: string) => Promise<Todo | null>;
   setCurrentInputElement: (input: HTMLInputElement | null) => void;
   setErrorMessage: (message: ErrorMessages) => void;
 }
